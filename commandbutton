@@ -1,3 +1,5 @@
+1. First Program
+
 Private Sub CommandButton1_Click()
 Me.tbPerson1.Value = "biscotti" & Selection
 End Sub
@@ -5,3 +7,23 @@ End Sub
 Private Sub btnPressHere_Click()
 
 End Sub
+
+2. Second Program
+
+Private Sub btnPressHere_Click()
+Me.tbPerson1 = "biscotti" & Selection
+
+//design mode off//
+//esse programa imprime na textbox a palavra "biscott" e o nome da lista em exemplo//
+//
+Dudes
+Billy
+Bob
+Sally
+Joe
+Dan
+Jess
+Peter
+
+End Sub
+
