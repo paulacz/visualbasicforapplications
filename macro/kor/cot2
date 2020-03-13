@@ -1,0 +1,161 @@
+'**********************************************************************************************************************
+'Este módulo contém as rotinas para exportar dados para o KorWeb
+'Macros / programação criada por Leandro Henrique Ungarelli - © 2018
+'**********************************************************************************************************************
+
+Sub Exporta_KorWeb()
+'
+' Cria arquivo de exportação para cadasto de insumos, itens de serviço e composições para o KorWeb
+' por meio de inserção de dados no arquivo fonte localizado no servidor da SUENT
+' © Leandro Henrique Ungarelli - 2018
+'
+    
+    'Desliga mensagens de alerta do Excel
+    Application.DisplayAlerts = False
+
+    'Identifica nome da Pasta de Trabalho que inicia o procedimento
+    NomePastaTrabalho = ThisWorkbook.Name
+    NomePastaCompleto = ThisWorkbook.FullName
+    
+    'Identifica nome e diretório de arquivos externos à Pasta de Trabalho que inicia o procedimento
+    Sheets("Menu de Ações").Select
+    NomeDiretorioModelo = Range("E12").Value
+    NomePastaModelo = Range("E14").Value
+    local_gravacao = Range("E16").Value
+    
+    'Abre a planilha fonte de exportação
+    On Error GoTo Falha_Arquivo1
+    Workbooks.Open Filename:=NomeDiretorioModelo & NomePastaModelo    'Workbooks.Open Filename:="X:\SUENG\E-SCU\SOLICITAÇÕES DE CADASTRO E COTAÇÕES\IMPORTAÇÃO MODELO KOR\ModeloImportarInsumoItemComposicao.xls"
+    On Error Resume Next
+    
+    '************************************* DO ARQUIVO SOLICITAÇÃO PARA A PLANILHA EXPORTAÇÃO - Insumos *************************************
+    
+    'Seleciona pasta de trabalho da SOLICITAÇÃO
+    Windows(NomePastaTrabalho).Activate
+    
+    'Identifica a quantidade de novos itens numerados
+    Sheets("IN").Select
+    ActiveSheet.ShowAllData
+    With ActiveSheet
+        LastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+    End With
+    
+    'Copia os dados da planilha "Insumo" da pasta de trabalho SOLICITAÇÃO
+    Sheets("Insumo").Select
+    Range(Cells(2, 1), Cells(LastRow, 11)).Select 'colunas de A a K
+    Selection.Copy
+    
+    'Cola os dados copiados de "Listas" na pasta de trabalho de EXPORTAÇÃO
+    Windows(NomePastaModelo).Activate       ' "ModeloImportarInsumoItemComposicao.xls"
+    Sheets("Insumo").Select
+    Range("A2").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+    Application.CutCopyMode = False
+    
+    'Substitui campos sem informação por "vazio"
+    Cells.Replace What:="x-x-x", Replacement:="", LookAt:=xlWhole, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+    Application.CutCopyMode = False
+    Range("A2").Select
+    
+    
+    '************************************* DO ARQUIVO SOLICITAÇÃO PARA A PLANILHA EXPORTAÇÃO - Serviços *************************************
+    
+    'Seleciona pasta de trabalho da SOLICITAÇÃO
+    Windows(NomePastaTrabalho).Activate
+    
+    'Identifica a quantidade de novos itens numerados
+    Sheets("IS").Select
+    ActiveSheet.ShowAllData
+    With ActiveSheet
+        LastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+    End With
+    
+    'Copia os dados da planilha "Insumo" da pasta de trabalho SOLICITAÇÃO
+    Sheets("Item de Serviço").Select
+    Range(Cells(2, 1), Cells(LastRow, 4)).Select 'colunas de A a D
+    Selection.Copy
+    
+    'Cola os dados copiados de "Listas" na pasta de trabalho de EXPORTAÇÃO
+    Windows(NomePastaModelo).Activate       ' "ModeloImportarInsumoItemComposicao.xls"
+    Sheets("Item de Serviço").Select
+    Range("A2").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+    Application.CutCopyMode = False
+    
+    'Substitui campos sem informação por "vazio"
+    Cells.Replace What:="x-x-x", Replacement:="", LookAt:=xlWhole, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+    Application.CutCopyMode = False
+    Range("A2").Select
+    
+    
+    '************************************* DO ARQUIVO SOLICITAÇÃO PARA A PLANILHA EXPORTAÇÃO - Matriz *************************************
+    
+    'Seleciona pasta de trabalho da SOLICITAÇÃO
+    Windows(NomePastaTrabalho).Activate
+    
+    'Identifica a quantidade de novos itens numerados
+    Sheets("MATRIZ").Select
+    With ActiveSheet
+        LastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+    End With
+    
+    'Copia os dados da planilha "Insumo" da pasta de trabalho SOLICITAÇÃO
+    Sheets("Composições").Select
+    Range(Cells(2, 1), Cells(LastRow, 5)).Select 'colunas de A a E
+    Selection.Copy
+    
+    'Cola os dados copiados de "Listas" na pasta de trabalho de EXPORTAÇÃO
+    Windows(NomePastaModelo).Activate       ' "ModeloImportarInsumoItemComposicao.xls"
+    Sheets("Composições").Select
+    Range("A2").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A2").Select
+        
+    'Substitui campos sem informação por "vazio"
+    Cells.Replace What:="x-x-x", Replacement:="", LookAt:=xlWhole, SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+    Application.CutCopyMode = False
+    
+    
+    '************************************* GERA ARQUIVO DA PLANILHA EXPORTAÇÃO *************************************
+    
+    'Grava o arquivo EXPORTAÇÃO
+    nome_arquivo = Replace(NomePastaTrabalho, ".xlsm", "")
+    On Error GoTo Falha_Arquivo2
+    ActiveWorkbook.SaveAs Filename:=local_gravacao & nome_arquivo, FileFormat:=xlExcel8, Password:="", WriteResPassword:="", ReadOnlyRecommended:=False, CreateBackup:=False
+    On Error Resume Next
+    
+    'Fecha a pasta de trabalho EXPORTAÇÃO
+    ActiveWindow.Close
+    
+    'Na pasta de trabalho de SOLICITAÇÃO, posiciona o cursor na primeira célula das planilhas exportadas
+    Windows(NomePastaTrabalho).Activate
+    Sheets("Item de Serviço").Select
+    Range("A2").Select
+    Sheets("Insumo").Select
+    Range("A2").Select
+    Sheets("Composições").Select
+    Range("A2").Select
+    Sheets("Menu de Ações").Select
+    
+    'Finaliza a rotina
+    GoTo Mensagem
+    
+Falha_Arquivo1:
+aviso = MsgBox("Erro em tempo de execução. Não foi localizado o arquivo " & NomeDiretorioModelo & NomePastaModelo & vbLf & vbLf & "Verifique se os dados de caminho e nome informados na guia Menu de Ações estão corretamente preenchidos antes de executar a rotina.", vbCritical)
+GoTo Fim
+    
+Falha_Arquivo2:
+aviso = MsgBox("Erro em tempo de execução. Não foi localizada a pasta de gravação " & local_gravacao & vbLf & vbLf & "Verifique se o caminho informado na guia Menu de Ações está corretamente preenchido antes de executar a rotina.", vbCritical)
+GoTo Fim
+    
+Mensagem:
+'Informa ao usuário a conclusão da rotina
+MsgBox ("Planilha de exportação para KorWeb gerada com sucesso." & vbLf & vbLf & _
+        "pasta: " & vbLf & local_gravacao & vbLf & vbLf & _
+        "nome do arquivo: " & vbLf & nome_arquivo)
+
+Fim:
+
+End Sub
+
